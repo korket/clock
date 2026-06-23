@@ -3,7 +3,7 @@
   "productName": "Clock",
   "version": "1.0.0",
   "description": "Clock",
-  "main": "index.html",
+  "main": "src/index.html",
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "identifier": "com.korket.clock",
   "build": {
-    "frontendDist": "../",
+    "frontendDist": "../src",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
