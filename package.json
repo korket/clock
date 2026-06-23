@@ -1,7 +1,8 @@
 {
   "name": "clock",
+  "productName": "Clock",
   "version": "1.0.0",
-  "description": "macOS Clock app replica for Windows",
+  "description": "Clock",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
