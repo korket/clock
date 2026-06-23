@@ -1081,10 +1081,10 @@
             if (e.target === e.currentTarget) closeCityModal();
         });
 
-        // Alarm modale
-        const alarmModal = $('#alarm-modal');
-        $('#alarm-cancel-btn').addEventListener('click', () => alarmModal.style.display = 'none');
-        $('#alarm-save-btn').addEventListener('click', saveAlarm);
+        // Alarm modal
+        const alarmModal = $('#add-alarm-modal');
+        $('#alarm-modal-cancel').addEventListener('click', () => alarmModal.style.display = 'none');
+        $('#alarm-modal-save').addEventListener('click', saveAlarm);
 
         // Pomodoro Settings modal
         const pomoModal = $('#pomodoro-modal');

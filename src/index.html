@@ -257,6 +257,36 @@
         </div>
     </div>
 
+    <!-- Pomodoro Settings Modal -->
+    <div class="modal-overlay" id="pomodoro-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <button class="modal-text-btn" id="pomo-cancel-btn">Cancel</button>
+                <h2>Settings</h2>
+                <button class="modal-text-btn primary" id="pomo-save-btn">Save</button>
+            </div>
+            <div class="pomodoro-settings-content" style="padding: 16px;">
+                <div class="alarm-field-row">
+                    <label>Focus (min)</label>
+                    <input type="number" id="pomo-focus-input" value="25" min="1" max="90" style="width: 60px; text-align: right; background: none; border: none; color: var(--text-primary); font-size: 16px;">
+                </div>
+                <div class="alarm-field-row">
+                    <label>Short Break (min)</label>
+                    <input type="number" id="pomo-short-input" value="5" min="1" max="30" style="width: 60px; text-align: right; background: none; border: none; color: var(--text-primary); font-size: 16px;">
+                </div>
+                <div class="alarm-field-row">
+                    <label>Long Break (min)</label>
+                    <input type="number" id="pomo-long-input" value="15" min="1" max="60" style="width: 60px; text-align: right; background: none; border: none; color: var(--text-primary); font-size: 16px;">
+                </div>
+                <div class="segmented-control" id="pomodoro-preset-control" style="margin-top: 15px; width: 100%; display: flex;">
+                    <div class="segment-bg"></div>
+                    <button class="segment active" data-preset="classic" style="flex: 1; justify-content: center;">Classic</button>
+                    <button class="segment" data-preset="long" style="flex: 1; justify-content: center;">Long</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
