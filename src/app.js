@@ -5,15 +5,32 @@
     'use strict';
 
     // ═══════════════════════════════════════════
+    // Utilities
+    // ═══════════════════════════════════════════
+    async function tauriInvoke(cmd, args) {
+        if (!window.__TAURI__) return null;
+        try {
+            if (window.__TAURI__.core && window.__TAURI__.core.invoke) {
+                return await window.__TAURI__.core.invoke(cmd, args);
+            } else if (window.__TAURI__.invoke) {
+                return await window.__TAURI__.invoke(cmd, args);
+            }
+        } catch (e) {
+            console.error(`Tauri invoke failed (${cmd}):`, e);
+        }
+        return null;
+    }
+
+    // ═══════════════════════════════════════════
     // Theme Logic
     // ═══════════════════════════════════════════
     function applyTheme() {
         if (state.theme === 'dark') {
             document.body.classList.add('dark-mode');
-            if (window.__TAURI__) window.__TAURI__.core.invoke('set_theme', { theme: 'dark' });
+            tauriInvoke('set_theme', { theme: 'dark' });
         } else {
             document.body.classList.remove('dark-mode');
-            if (window.__TAURI__) window.__TAURI__.core.invoke('set_theme', { theme: 'light' });
+            tauriInvoke('set_theme', { theme: 'light' });
         }
     }
 
@@ -128,7 +145,7 @@
         try {
             let json = '';
             if (window.__TAURI__) {
-                json = await window.__TAURI__.core.invoke('load_state');
+                json = await tauriInvoke('load_state');
             } else {
                 json = localStorage.getItem('macClockState');
             }
@@ -174,7 +191,7 @@
             };
             const json = JSON.stringify(data);
             if (window.__TAURI__) {
-                window.__TAURI__.core.invoke('save_state', { state: json }).catch(e => console.error(e));
+                tauriInvoke('save_state', { state: json });
             } else {
                 localStorage.setItem('macClockState', json);
             }
