@@ -871,6 +871,27 @@
             return Math.round(scroll.scrollTop / ITEM_HEIGHT);
         }
 
+        // Custom wheel handler for smooth 1-by-1 scrolling
+        let wheelAccumulator = 0;
+        scroll.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            let delta = e.deltaY;
+            if (e.deltaMode === 1) delta *= 33; // DOM_DELTA_LINE
+            
+            wheelAccumulator += delta;
+            
+            // 90 is a good threshold: standard Windows wheel tick is 100
+            // This ensures 1 wheel tick = 1 item scroll
+            const threshold = 90;
+            if (Math.abs(wheelAccumulator) >= threshold) {
+                const steps = Math.trunc(wheelAccumulator / threshold);
+                wheelAccumulator -= steps * threshold; // keep remainder
+                
+                scrollToIndex(selectedIndex + steps, true);
+            }
+        }, { passive: false });
+
         // Debounced scroll end
         let scrollTimer;
         scroll.addEventListener('scroll', () => {
