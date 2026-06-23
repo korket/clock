@@ -290,12 +290,12 @@
     // Tab Switching
     // ═══════════════════════════════════════════
     function initTabs() {
-        const segments = $$('.segment');
+        const segments = $$('header .segment');
         const segBg = $('#segment-bg');
         const addBtn = $('#add-btn');
 
         function updateSegBg() {
-            const active = $(`.segment.active`);
+            const active = $(`header .segment.active`);
             if (active && segBg) {
                 segBg.style.width = active.offsetWidth + 'px';
                 segBg.style.transform = `translateX(${active.offsetLeft - 2}px)`;
