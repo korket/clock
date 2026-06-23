@@ -1159,7 +1159,13 @@
         ring.style.strokeDashoffset = '0';
         $('#pomodoro-start-btn').addEventListener('click', togglePomodoro);
         $('#pomodoro-skip-btn').addEventListener('click', skipPomodoroPhase);
+        let lastResetTime = 0;
         $('#pomodoro-reset-btn').addEventListener('click', () => {
+            const now = Date.now();
+            if (now - lastResetTime < 500) {
+                state.pomodoro.cycle = 0;
+            }
+            lastResetTime = now;
             resetPomodoroPhase(state.pomodoro.phase);
         });
         
