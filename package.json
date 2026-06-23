@@ -3,43 +3,15 @@
   "productName": "Clock",
   "version": "1.0.0",
   "description": "Clock",
-  "main": "main.js",
+  "main": "index.html",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder --win",
-    "pack": "electron-builder --win --dir"
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
   },
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "build": {
-    "appId": "com.clock.app",
-    "productName": "Clock",
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "icon.png"
-    },
-    "nsis": {
-      "oneClick": true,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": false,
-      "shortcutName": "Clock"
-    },
-    "files": [
-      "main.js",
-      "index.html",
-      "style.css",
-      "app.js",
-      "icon.png"
-    ]
-  },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0-rc.0"
   },
