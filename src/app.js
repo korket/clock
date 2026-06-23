@@ -1157,9 +1157,11 @@
         const ring = $('#pomodoro-ring-progress');
         ring.style.strokeDasharray = POMO_CIRCUMFERENCE;
         ring.style.strokeDashoffset = '0';
-        
         $('#pomodoro-start-btn').addEventListener('click', togglePomodoro);
         $('#pomodoro-skip-btn').addEventListener('click', skipPomodoroPhase);
+        $('#pomodoro-reset-btn').addEventListener('click', () => {
+            resetPomodoroPhase(state.pomodoro.phase);
+        });
         
         // Restore from loaded state
         if (state.pomodoro.running || state.pomodoro.paused) {

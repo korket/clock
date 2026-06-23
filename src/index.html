@@ -187,12 +187,14 @@
                         </svg>
                         <div class="timer-remaining-text pomodoro-remaining-text" id="pomodoro-remaining">25:00</div>
                     </div>
-                    
                     <div class="round-btn-row">
-                        <button class="round-btn round-btn--gray" id="pomodoro-skip-btn">
+                        <button type="button" class="round-btn round-btn--gray" id="pomodoro-skip-btn">
                             <span>Skip</span>
                         </button>
-                        <button class="round-btn round-btn--green" id="pomodoro-start-btn">
+                        <button type="button" class="round-btn round-btn--gray" id="pomodoro-reset-btn">
+                            <span>Reset</span>
+                        </button>
+                        <button type="button" class="round-btn round-btn--green" id="pomodoro-start-btn">
                             <span>Start</span>
                         </button>
                     </div>
@@ -261,9 +263,9 @@
     <div class="modal-overlay" id="pomodoro-modal">
         <div class="modal">
             <div class="modal-header">
-                <button class="modal-text-btn" id="pomo-cancel-btn">Cancel</button>
+                <button type="button" class="modal-text-btn" id="pomo-cancel-btn">Cancel</button>
                 <h2>Settings</h2>
-                <button class="modal-text-btn primary" id="pomo-save-btn">Save</button>
+                <button type="button" class="modal-text-btn primary" id="pomo-save-btn">Save</button>
             </div>
             <div class="pomodoro-settings-content" style="padding: 16px;">
                 <div class="alarm-field-row">
