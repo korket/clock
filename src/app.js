@@ -1131,7 +1131,6 @@
                 }
             });
         });
-        });
 
         // Alarm modal
         $('#add-alarm-modal').addEventListener('click', (e) => {
