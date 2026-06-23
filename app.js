@@ -5,7 +5,26 @@
     'use strict';
 
     // ═══════════════════════════════════════════
-    // City Database
+    // Theme Logic
+    // ═══════════════════════════════════════════
+    function applyTheme() {
+        if (state.theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (window.electronAPI) window.electronAPI.setTheme('dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            if (window.electronAPI) window.electronAPI.setTheme('light');
+        }
+    }
+
+    function toggleTheme() {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+        saveState();
+        applyTheme();
+    }
+
+    // ═══════════════════════════════════════════
+    // Navigation / Tabs
     // ═══════════════════════════════════════════
     const CITIES = [
         { name: 'Cupertino', country: 'USA', tz: 'America/Los_Angeles' },
@@ -98,7 +117,8 @@
                 shortBreak: 5,
                 longBreak: 15
             }
-        }
+        },
+        theme: 'light' // 'light' or 'dark'
     };
 
     // ═══════════════════════════════════════════
@@ -128,6 +148,8 @@
                         state.pomodoro.endTime = 0;
                     }
                 }
+                
+                state.theme = saved.theme || 'light';
             } else {
                 state.worldClocks = DEFAULT_CITIES.slice();
             }
@@ -145,6 +167,7 @@
                 recentTimers: state.recentTimers,
                 lastTimerSetting: state.lastTimerSetting,
                 pomodoro: state.pomodoro,
+                theme: state.theme,
             };
             if (window.electronAPI) {
                 window.electronAPI.saveState(data);
@@ -1281,6 +1304,11 @@
     // ═══════════════════════════════════════════
     async function init() {
         await loadState();
+        applyTheme();
+        
+        // Theme toggle listener
+        $('#theme-btn').addEventListener('click', toggleTheme);
+
         initTabs();
         initModals();
         initStopwatch();

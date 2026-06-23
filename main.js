@@ -19,6 +19,16 @@ ipcMain.on('save-state', (event, state) => {
     } catch (e) {}
 });
 
+ipcMain.on('set-theme', (event, theme) => {
+    const isDark = theme === 'dark';
+    if (mainWindow) {
+        mainWindow.setTitleBarOverlay({
+            color: isDark ? '#1C1C1E' : '#ECECEC',
+            symbolColor: isDark ? '#FFFFFF' : '#1D1D1F'
+        });
+    }
+});
+
 let mainWindow;
 
 function createWindow() {
