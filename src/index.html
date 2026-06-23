@@ -161,12 +161,12 @@
                     </div>
 
                     <div class="timer-running-state" id="timer-running-state" style="display:none">
-                        <div class="timer-circle-wrap">
-                            <svg class="timer-svg" viewBox="0 0 200 200">
+                        <div class="timer-ring-wrap">
+                            <svg class="timer-ring" viewBox="0 0 200 200">
                                 <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
                                 <circle class="timer-ring-progress" id="timer-ring-progress" cx="100" cy="100" r="90" />
                             </svg>
-                            <div class="timer-remaining-text" id="timer-remaining">00:00:00</div>
+                            <div class="timer-remaining" id="timer-remaining">00:00:00</div>
                         </div>
                         <div class="round-btn-row">
                             <button class="round-btn round-btn--gray" id="timer-cancel-btn-2">
@@ -190,21 +190,23 @@
                     </button>
                     
                     <div class="pomodoro-header">
-                        <h2 class="pomodoro-phase-label" id="pomodoro-phase-label">Focus</h2>
+                        <div class="pomodoro-phase-label-wrap">
+                            <h2 class="pomodoro-phase-label" id="pomodoro-phase-label">Focus</h2>
+                        </div>
                         <div class="pomodoro-cycles" id="pomodoro-cycles">
-                            <div class="cycle-dot"></div>
+                            <div class="cycle-dot active"></div>
                             <div class="cycle-dot"></div>
                             <div class="cycle-dot"></div>
                             <div class="cycle-dot"></div>
                         </div>
                     </div>
 
-                    <div class="timer-circle-wrap pomodoro-circle-wrap">
-                        <svg class="timer-svg" viewBox="0 0 200 200">
+                    <div class="timer-ring-wrap pomodoro-circle-wrap">
+                        <svg class="timer-ring" viewBox="0 0 200 200">
                             <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
                             <circle class="timer-ring-progress" id="pomodoro-ring-progress" cx="100" cy="100" r="90" />
                         </svg>
-                        <div class="timer-remaining-text pomodoro-remaining-text" id="pomodoro-remaining">25:00</div>
+                        <div class="timer-remaining pomodoro-remaining-text" id="pomodoro-remaining">25:00</div>
                     </div>
                     <div class="round-btn-row">
                         <button type="button" class="round-btn round-btn--gray" id="pomodoro-skip-btn">
