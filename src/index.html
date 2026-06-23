@@ -4,12 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clock</title>
+    <style>
+        #global-error {
+            position: fixed; top: 0; left: 0; right: 0; background: red; color: white;
+            z-index: 999999; padding: 10px; font-family: monospace; display: none; white-space: pre-wrap;
+        }
+    </style>
+    <script>
+        window.addEventListener('error', (e) => {
+            const err = document.getElementById('global-error');
+            err.style.display = 'block';
+            err.textContent += e.message + ' at ' + e.filename + ':' + e.lineno + '\n';
+        });
+        window.addEventListener('unhandledrejection', (e) => {
+            const err = document.getElementById('global-error');
+            err.style.display = 'block';
+            err.textContent += e.reason + '\n';
+        });
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,200;14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="global-error"></div>
     <div id="app">
         <!-- Toolbar -->
         <header class="toolbar">
