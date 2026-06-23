@@ -144,7 +144,40 @@ input {
 
 .toolbar-leading {
     justify-content: flex-start;
+    align-items: center;
+    gap: 8px; /* space between window controls and add button */
+    padding-left: 12px;
 }
+
+/* ── Custom Window Controls ── */
+.win-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: background 0.1s, color 0.1s;
+    -webkit-app-region: no-drag;
+}
+.toolbar-leading:hover .win-btn {
+    color: rgba(0, 0, 0, 0.5);
+}
+.win-btn svg {
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+.toolbar-leading:hover .win-btn svg {
+    opacity: 1;
+}
+.win-close { background: #FF5F56; }
+.win-close:active { background: #E0443E; }
+.win-minimize { background: #FFBD2E; }
+.win-minimize:active { background: #DEA125; }
 
 .toolbar-trailing {
     justify-content: flex-end;

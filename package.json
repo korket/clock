@@ -40,8 +40,10 @@
       "icon.png"
     ]
   },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0-rc.0"
+  },
   "devDependencies": {
-    "electron": "^42.4.1",
-    "electron-builder": "^25.1.8"
+    "@tauri-apps/cli": "^2.0.0-rc.0"
   }
 }

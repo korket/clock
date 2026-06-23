@@ -10,10 +10,8 @@
     function applyTheme() {
         if (state.theme === 'dark') {
             document.body.classList.add('dark-mode');
-            if (window.electronAPI) window.electronAPI.setTheme('dark');
         } else {
             document.body.classList.remove('dark-mode');
-            if (window.electronAPI) window.electronAPI.setTheme('light');
         }
     }
 
@@ -126,13 +124,15 @@
     // ═══════════════════════════════════════════
     async function loadState() {
         try {
-            let saved = null;
-            if (window.electronAPI) {
-                saved = await window.electronAPI.loadState();
+            let json = '';
+            if (window.__TAURI__) {
+                json = await window.__TAURI__.core.invoke('load_state');
             } else {
-                saved = JSON.parse(localStorage.getItem('macClockState'));
+                json = localStorage.getItem('macClockState');
             }
-            if (saved) {
+
+            if (json) {
+                const saved = JSON.parse(json);
                 state.activeTab = saved.activeTab || 'world-clock';
                 state.worldClocks = saved.worldClocks || DEFAULT_CITIES.slice();
                 state.alarms = saved.alarms || [];
@@ -154,6 +154,7 @@
                 state.worldClocks = DEFAULT_CITIES.slice();
             }
         } catch (e) {
+            console.error('Failed to load state:', e);
             state.worldClocks = DEFAULT_CITIES.slice();
         }
     }
@@ -169,12 +170,15 @@
                 pomodoro: state.pomodoro,
                 theme: state.theme,
             };
-            if (window.electronAPI) {
-                window.electronAPI.saveState(data);
+            const json = JSON.stringify(data);
+            if (window.__TAURI__) {
+                window.__TAURI__.core.invoke('save_state', { state: json }).catch(e => console.error(e));
             } else {
-                localStorage.setItem('macClockState', JSON.stringify(data));
+                localStorage.setItem('macClockState', json);
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            console.error('Failed to save state:', e);
+        }
     }
 
     // ═══════════════════════════════════════════
@@ -1308,6 +1312,18 @@
         
         // Theme toggle listener
         $('#theme-btn').addEventListener('click', toggleTheme);
+
+        // Window Controls
+        if (window.__TAURI__) {
+            const { Window } = window.__TAURI__.window;
+            const appWindow = Window.getCurrent();
+            
+            const minBtn = $('#win-min-btn');
+            const closeBtn = $('#win-close-btn');
+            
+            if (minBtn) minBtn.addEventListener('click', () => appWindow.minimize());
+            if (closeBtn) closeBtn.addEventListener('click', () => appWindow.close());
+        }
 
         initTabs();
         initModals();
