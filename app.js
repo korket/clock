@@ -91,21 +91,14 @@
     // ═══════════════════════════════════════════
     // Persistence
     // ═══════════════════════════════════════════
-    function saveState() {
+    async function loadState() {
         try {
-            localStorage.setItem('macClockState', JSON.stringify({
-                activeTab: state.activeTab,
-                worldClocks: state.worldClocks,
-                alarms: state.alarms,
-                recentTimers: state.recentTimers,
-                lastTimerSetting: state.lastTimerSetting,
-            }));
-        } catch (e) { /* ignore */ }
-    }
-
-    function loadState() {
-        try {
-            const saved = JSON.parse(localStorage.getItem('macClockState'));
+            let saved = null;
+            if (window.electronAPI) {
+                saved = await window.electronAPI.loadState();
+            } else {
+                saved = JSON.parse(localStorage.getItem('macClockState'));
+            }
             if (saved) {
                 state.activeTab = saved.activeTab || 'world-clock';
                 state.worldClocks = saved.worldClocks || DEFAULT_CITIES.slice();
@@ -118,6 +111,23 @@
         } catch (e) {
             state.worldClocks = DEFAULT_CITIES.slice();
         }
+    }
+
+    function saveState() {
+        try {
+            const data = {
+                activeTab: state.activeTab,
+                worldClocks: state.worldClocks,
+                alarms: state.alarms,
+                recentTimers: state.recentTimers,
+                lastTimerSetting: state.lastTimerSetting,
+            };
+            if (window.electronAPI) {
+                window.electronAPI.saveState(data);
+            } else {
+                localStorage.setItem('macClockState', JSON.stringify(data));
+            }
+        } catch (e) { /* ignore */ }
     }
 
     // ═══════════════════════════════════════════
@@ -667,10 +677,18 @@
     const CIRCUMFERENCE = 2 * Math.PI * 90; // r=90 from SVG
 
     function initTimer() {
+        function onPickerChange() {
+            const h = parseInt(timerPickerH.getValue()) || 0;
+            const m = parseInt(timerPickerM.getValue()) || 0;
+            const s = parseInt(timerPickerS.getValue()) || 0;
+            state.lastTimerSetting = { h, m, s };
+            saveState();
+        }
+
         // Initialize picker columns
-        timerPickerH = createPicker('#picker-hours', Array.from({length: 24}, (_, i) => i), 0);
-        timerPickerM = createPicker('#picker-minutes', Array.from({length: 60}, (_, i) => i), 0);
-        timerPickerS = createPicker('#picker-seconds', Array.from({length: 60}, (_, i) => i), 0);
+        timerPickerH = createPicker('#picker-hours', Array.from({length: 24}, (_, i) => i), 0, onPickerChange);
+        timerPickerM = createPicker('#picker-minutes', Array.from({length: 60}, (_, i) => i), 0, onPickerChange);
+        timerPickerS = createPicker('#picker-seconds', Array.from({length: 60}, (_, i) => i), 0, onPickerChange);
 
         // Restore last timer setting
         const last = state.lastTimerSetting || { h: 0, m: 5, s: 0 };
@@ -844,7 +862,7 @@
     // ═══════════════════════════════════════════
     // Scroll Picker Component
     // ═══════════════════════════════════════════
-    function createPicker(selector, values, defaultIndex) {
+    function createPicker(selector, values, defaultIndex, onChange) {
         const container = document.querySelector(selector);
         const ITEM_HEIGHT = 36;
         const VISIBLE = 5;
@@ -897,8 +915,12 @@
         scroll.addEventListener('scroll', () => {
             clearTimeout(scrollTimer);
             scrollTimer = setTimeout(() => {
+                const oldIndex = selectedIndex;
                 selectedIndex = getSelectedIndex();
                 scrollToIndex(selectedIndex, true);
+                if (oldIndex !== selectedIndex && onChange) {
+                    onChange();
+                }
             }, 80);
         });
 
@@ -1016,8 +1038,8 @@
     // ═══════════════════════════════════════════
     // Initialization
     // ═══════════════════════════════════════════
-    function init() {
-        loadState();
+    async function init() {
+        await loadState();
         initTabs();
         initModals();
         initStopwatch();

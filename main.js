@@ -1,8 +1,23 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
-// Disable hardware acceleration for cleaner rendering on some systems
-// app.disableHardwareAcceleration();
+const stateFile = path.join(app.getPath('userData'), 'clock-state.json');
+
+ipcMain.handle('load-state', () => {
+    try {
+        if (fs.existsSync(stateFile)) {
+            return JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+        }
+    } catch (e) {}
+    return null;
+});
+
+ipcMain.on('save-state', (event, state) => {
+    try {
+        fs.writeFileSync(stateFile, JSON.stringify(state));
+    } catch (e) {}
+});
 
 let mainWindow;
 
@@ -22,6 +37,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js'),
         },
         show: false, // Show after ready to avoid flash
         icon: path.join(__dirname, 'icon.png'),
