@@ -935,6 +935,65 @@ input {
 }
 
 /* ═══════════════════════════════════════════════
+   Pomodoro
+   ═══════════════════════════════════════════════ */
+.pomodoro-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-top: 32px;
+    position: relative;
+}
+
+.pomodoro-settings-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: var(--text-secondary);
+}
+
+.pomodoro-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.pomodoro-phase-label {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.pomodoro-cycles {
+    display: flex;
+    gap: 6px;
+}
+
+.cycle-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+    transition: background var(--transition);
+}
+
+.cycle-dot.active {
+    background: var(--accent-orange);
+}
+
+.pomodoro-circle-wrap {
+    margin-bottom: auto;
+}
+
+.pomodoro-remaining-text {
+    font-size: 56px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════
    Modals
    ═══════════════════════════════════════════════ */
 .modal-overlay {

@@ -86,6 +86,19 @@
         },
         recentTimers: [],      // Array of seconds
         lastTimerSetting: { h: 0, m: 5, s: 0 },
+        pomodoro: {
+            phase: 'focus', // focus, shortBreak, longBreak
+            cycle: 0, // 0 to 3
+            running: false,
+            paused: false,
+            remaining: 25 * 60,
+            endTime: 0,
+            settings: {
+                focus: 25,
+                shortBreak: 5,
+                longBreak: 15
+            }
+        }
     };
 
     // ═══════════════════════════════════════════
@@ -105,6 +118,16 @@
                 state.alarms = saved.alarms || [];
                 state.recentTimers = saved.recentTimers || [];
                 state.lastTimerSetting = saved.lastTimerSetting || { h: 0, m: 5, s: 0 };
+                
+                if (saved.pomodoro) {
+                    state.pomodoro = saved.pomodoro;
+                    // Reset running state if it was loaded (we don't persist active timers over long periods automatically yet)
+                    if (state.pomodoro.running) {
+                        state.pomodoro.paused = true;
+                        state.pomodoro.running = false;
+                        state.pomodoro.endTime = 0;
+                    }
+                }
             } else {
                 state.worldClocks = DEFAULT_CITIES.slice();
             }
@@ -121,6 +144,7 @@
                 alarms: state.alarms,
                 recentTimers: state.recentTimers,
                 lastTimerSetting: state.lastTimerSetting,
+                pomodoro: state.pomodoro,
             };
             if (window.electronAPI) {
                 window.electronAPI.saveState(data);
@@ -1011,20 +1035,237 @@
             if (e.target === e.currentTarget) closeCityModal();
         });
 
+        // Alarm modale
+        const alarmModal = $('#alarm-modal');
+        $('#alarm-cancel-btn').addEventListener('click', () => alarmModal.style.display = 'none');
+        $('#alarm-save-btn').addEventListener('click', saveAlarm);
+
+        // Pomodoro Settings modal
+        const pomoModal = $('#pomodoro-modal');
+        $('#pomodoro-settings-btn').addEventListener('click', () => {
+            $('#pomo-focus-input').value = state.pomodoro.settings.focus;
+            $('#pomo-short-input').value = state.pomodoro.settings.shortBreak;
+            $('#pomo-long-input').value = state.pomodoro.settings.longBreak;
+            pomoModal.style.display = 'flex';
+        });
+        
+        $('#pomo-cancel-btn').addEventListener('click', () => pomoModal.style.display = 'none');
+        
+        $('#pomo-save-btn').addEventListener('click', () => {
+            const focus = parseInt($('#pomo-focus-input').value) || 25;
+            const short = parseInt($('#pomo-short-input').value) || 5;
+            const long = parseInt($('#pomo-long-input').value) || 15;
+            
+            state.pomodoro.settings = { focus, shortBreak: short, longBreak: long };
+            saveState();
+            
+            // If not running, reset timer to new setting
+            if (!state.pomodoro.running && !state.pomodoro.paused) {
+                resetPomodoroPhase(state.pomodoro.phase);
+            }
+            
+            pomoModal.style.display = 'none';
+        });
+
+        // Preset buttons
+        $$('#pomodoro-preset-control .segment').forEach(seg => {
+            seg.addEventListener('click', () => {
+                $$('#pomodoro-preset-control .segment').forEach(s => s.classList.remove('active'));
+                seg.classList.add('active');
+                
+                const preset = seg.dataset.preset;
+                if (preset === 'classic') {
+                    $('#pomo-focus-input').value = 25;
+                    $('#pomo-short-input').value = 5;
+                    $('#pomo-long-input').value = 15;
+                } else if (preset === 'long') {
+                    $('#pomo-focus-input').value = 50;
+                    $('#pomo-short-input').value = 10;
+                    $('#pomo-long-input').value = 30;
+                }
+            });
+        });
+        });
+
         // Alarm modal
-        $('#alarm-modal-cancel').addEventListener('click', closeAlarmModal);
-        $('#alarm-modal-save').addEventListener('click', saveAlarm);
         $('#add-alarm-modal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeAlarmModal();
+            if (e.target === e.currentTarget) alarmModal.style.display = 'none';
         });
 
         // ESC to close
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeCityModal();
-                closeAlarmModal();
+                alarmModal.style.display = 'none';
+                pomoModal.style.display = 'none';
             }
         });
+    }
+
+    // ═══════════════════════════════════════════
+    // Pomodoro Component
+    // ═══════════════════════════════════════════
+    let pomodoroAnimFrame;
+    const POMO_CIRCUMFERENCE = 2 * Math.PI * 90;
+
+    function initPomodoro() {
+        const ring = $('#pomodoro-ring-progress');
+        ring.style.strokeDasharray = POMO_CIRCUMFERENCE;
+        ring.style.strokeDashoffset = '0';
+        
+        $('#pomodoro-start-btn').addEventListener('click', togglePomodoro);
+        $('#pomodoro-skip-btn').addEventListener('click', skipPomodoroPhase);
+        
+        // Restore from loaded state
+        if (state.pomodoro.running || state.pomodoro.paused) {
+            updatePomodoroUI();
+            if (state.pomodoro.running) tickPomodoro();
+        } else {
+            resetPomodoroPhase(state.pomodoro.phase);
+        }
+    }
+
+    function togglePomodoro() {
+        if (!state.pomodoro.running && !state.pomodoro.paused) {
+            // Start fresh
+            state.pomodoro.running = true;
+            state.pomodoro.endTime = Date.now() + state.pomodoro.remaining * 1000;
+            saveState();
+            updatePomodoroUI();
+            tickPomodoro();
+        } else if (state.pomodoro.running) {
+            // Pause
+            state.pomodoro.paused = true;
+            state.pomodoro.running = false;
+            cancelAnimationFrame(pomodoroAnimFrame);
+            saveState();
+            updatePomodoroUI();
+        } else {
+            // Resume
+            state.pomodoro.paused = false;
+            state.pomodoro.running = true;
+            state.pomodoro.endTime = Date.now() + state.pomodoro.remaining * 1000;
+            saveState();
+            updatePomodoroUI();
+            tickPomodoro();
+        }
+    }
+
+    function skipPomodoroPhase() {
+        cancelAnimationFrame(pomodoroAnimFrame);
+        advancePomodoroPhase();
+    }
+
+    function advancePomodoroPhase() {
+        let p = state.pomodoro;
+        
+        if (p.phase === 'focus') {
+            p.cycle++;
+            if (p.cycle >= 4) {
+                p.phase = 'longBreak';
+                p.cycle = 0;
+            } else {
+                p.phase = 'shortBreak';
+            }
+        } else {
+            p.phase = 'focus';
+        }
+        
+        resetPomodoroPhase(p.phase);
+    }
+
+    function resetPomodoroPhase(phase) {
+        state.pomodoro.phase = phase;
+        state.pomodoro.running = false;
+        state.pomodoro.paused = false;
+        cancelAnimationFrame(pomodoroAnimFrame);
+        
+        const settings = state.pomodoro.settings;
+        if (phase === 'focus') state.pomodoro.remaining = settings.focus * 60;
+        else if (phase === 'shortBreak') state.pomodoro.remaining = settings.shortBreak * 60;
+        else state.pomodoro.remaining = settings.longBreak * 60;
+        
+        saveState();
+        updatePomodoroUI();
+    }
+
+    function tickPomodoro() {
+        if (!state.pomodoro.running) return;
+
+        const now = Date.now();
+        const remaining = Math.max(0, (state.pomodoro.endTime - now) / 1000);
+        state.pomodoro.remaining = remaining;
+
+        // Visual updates
+        $('#pomodoro-remaining').textContent = formatTimer(remaining);
+        
+        const settings = state.pomodoro.settings;
+        let total = settings.focus * 60;
+        if (state.pomodoro.phase === 'shortBreak') total = settings.shortBreak * 60;
+        if (state.pomodoro.phase === 'longBreak') total = settings.longBreak * 60;
+
+        const progress = remaining / total;
+        $('#pomodoro-ring-progress').style.strokeDashoffset = POMO_CIRCUMFERENCE * (1 - progress);
+
+        if (remaining <= 0) {
+            playTimerSound();
+            advancePomodoroPhase();
+            return;
+        }
+
+        pomodoroAnimFrame = requestAnimationFrame(tickPomodoro);
+    }
+
+    function updatePomodoroUI() {
+        const p = state.pomodoro;
+        const ring = $('#pomodoro-ring-progress');
+        const phaseLabel = $('#pomodoro-phase-label');
+        
+        // Update labels and colors
+        if (p.phase === 'focus') {
+            phaseLabel.textContent = 'Focus';
+            ring.style.stroke = 'var(--accent-orange)';
+        } else if (p.phase === 'shortBreak') {
+            phaseLabel.textContent = 'Short Break';
+            ring.style.stroke = 'var(--accent-green)';
+        } else {
+            phaseLabel.textContent = 'Long Break';
+            ring.style.stroke = 'var(--accent-blue)';
+        }
+
+        // Setup dots
+        const dots = $$('#pomodoro-cycles .cycle-dot');
+        dots.forEach((dot, i) => {
+            if (i < p.cycle) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+
+        // Time and ring position
+        $('#pomodoro-remaining').textContent = formatTimer(p.remaining);
+        
+        let total = p.settings.focus * 60;
+        if (p.phase === 'shortBreak') total = p.settings.shortBreak * 60;
+        if (p.phase === 'longBreak') total = p.settings.longBreak * 60;
+        
+        if (!p.running && !p.paused) {
+            ring.style.strokeDashoffset = 0;
+        } else {
+            const progress = p.remaining / total;
+            ring.style.strokeDashoffset = POMO_CIRCUMFERENCE * (1 - progress);
+        }
+
+        // Buttons
+        const startBtn = $('#pomodoro-start-btn');
+        if (p.running) {
+            startBtn.className = 'round-btn round-btn--orange';
+            startBtn.querySelector('span').textContent = 'Pause';
+        } else if (p.paused) {
+            startBtn.className = 'round-btn round-btn--green';
+            startBtn.querySelector('span').textContent = 'Resume';
+        } else {
+            startBtn.className = 'round-btn round-btn--green';
+            startBtn.querySelector('span').textContent = 'Start';
+        }
     }
 
     // ═══════════════════════════════════════════
@@ -1044,6 +1285,7 @@
         initModals();
         initStopwatch();
         initTimer();
+        initPomodoro();
 
         renderWorldClocks();
         renderAlarms();

@@ -47,6 +47,13 @@
                         </svg>
                         <span>Timer</span>
                     </button>
+                    <button class="segment" data-tab="pomodoro">
+                        <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v2"/><path d="M12 20v2"/><path d="M5 12H3"/><path d="M21 12h-2"/><path d="M19.07 4.93l-1.41 1.41"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 19.07l-1.41-1.41"/><path d="M6.34 6.34L4.93 4.93"/>
+                            <circle cx="12" cy="12" r="5"/>
+                        </svg>
+                        <span>Pomodoro</span>
+                    </button>
                 </div>
             </div>
             <div class="toolbar-trailing"></div>
@@ -103,7 +110,6 @@
             <!-- Timer Tab -->
             <section id="timer-tab" class="tab">
                 <div class="timer-container">
-                    <!-- Picker State -->
                     <div class="timer-picker-state" id="timer-picker-state">
                         <div class="timer-picker-wrap">
                             <div class="picker-group">
@@ -119,7 +125,7 @@
                                 <span class="picker-label">sec</span>
                             </div>
                         </div>
-                        <div class="round-btn-row timer-btn-row">
+                        <div class="round-btn-row">
                             <button class="round-btn round-btn--gray" id="timer-cancel-btn">
                                 <span>Cancel</span>
                             </button>
@@ -129,16 +135,16 @@
                         </div>
                         <div class="recent-timers" id="recent-timers"></div>
                     </div>
-                    <!-- Running State -->
+
                     <div class="timer-running-state" id="timer-running-state" style="display:none">
-                        <div class="timer-ring-wrap">
-                            <svg class="timer-ring" viewBox="0 0 200 200">
+                        <div class="timer-circle-wrap">
+                            <svg class="timer-svg" viewBox="0 0 200 200">
                                 <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
                                 <circle class="timer-ring-progress" id="timer-ring-progress" cx="100" cy="100" r="90" />
                             </svg>
-                            <div class="timer-remaining" id="timer-remaining">0:00</div>
+                            <div class="timer-remaining-text" id="timer-remaining">00:00:00</div>
                         </div>
-                        <div class="round-btn-row timer-btn-row">
+                        <div class="round-btn-row">
                             <button class="round-btn round-btn--gray" id="timer-cancel-btn-2">
                                 <span>Cancel</span>
                             </button>
@@ -146,6 +152,44 @@
                                 <span>Pause</span>
                             </button>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pomodoro Tab -->
+            <section id="pomodoro-tab" class="tab">
+                <div class="pomodoro-container">
+                    <button class="icon-btn pomodoro-settings-btn" id="pomodoro-settings-btn" title="Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="pomodoro-header">
+                        <h2 class="pomodoro-phase-label" id="pomodoro-phase-label">Focus</h2>
+                        <div class="pomodoro-cycles" id="pomodoro-cycles">
+                            <div class="cycle-dot"></div>
+                            <div class="cycle-dot"></div>
+                            <div class="cycle-dot"></div>
+                            <div class="cycle-dot"></div>
+                        </div>
+                    </div>
+
+                    <div class="timer-circle-wrap pomodoro-circle-wrap">
+                        <svg class="timer-svg" viewBox="0 0 200 200">
+                            <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
+                            <circle class="timer-ring-progress" id="pomodoro-ring-progress" cx="100" cy="100" r="90" />
+                        </svg>
+                        <div class="timer-remaining-text pomodoro-remaining-text" id="pomodoro-remaining">25:00</div>
+                    </div>
+                    
+                    <div class="round-btn-row">
+                        <button class="round-btn round-btn--gray" id="pomodoro-skip-btn">
+                            <span>Skip</span>
+                        </button>
+                        <button class="round-btn round-btn--green" id="pomodoro-start-btn">
+                            <span>Start</span>
+                        </button>
                     </div>
                 </div>
             </section>
