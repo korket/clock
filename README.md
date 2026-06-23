@@ -22,7 +22,7 @@ Because this project uses Tauri, you will need [Rust](https://rustup.rs/) instal
 npm install
 
 # Run the app in development mode
-npx tauri dev
+npm run dev
 ```
 
 ## Build Installer
@@ -30,7 +30,7 @@ npx tauri dev
 To build a standalone, highly-optimized `.exe` installer:
 
 ```bash
-npx tauri build
+npm run build
 ```
 
 The installer will be output to the `src-tauri/target/release/bundle/nsis/` folder.
