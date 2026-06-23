@@ -1211,25 +1211,26 @@
 
     function advancePomodoroPhase() {
         let p = state.pomodoro;
+        let nextPhase;
         
         if (p.phase === 'focus') {
             p.cycle++;
             if (p.cycle >= 4) {
-                p.phase = 'longBreak';
+                nextPhase = 'longBreak';
                 p.cycle = 0;
             } else {
-                p.phase = 'shortBreak';
+                nextPhase = 'shortBreak';
             }
         } else {
-            p.phase = 'focus';
+            nextPhase = 'focus';
         }
         
-        resetPomodoroPhase(p.phase);
+        resetPomodoroPhase(nextPhase, true); // Auto-start the next phase
     }
 
-    function resetPomodoroPhase(phase) {
+    function resetPomodoroPhase(phase, autoStart = false) {
         state.pomodoro.phase = phase;
-        state.pomodoro.running = false;
+        state.pomodoro.running = autoStart;
         state.pomodoro.paused = false;
         cancelAnimationFrame(pomodoroAnimFrame);
         
@@ -1238,8 +1239,16 @@
         else if (phase === 'shortBreak') state.pomodoro.remaining = settings.shortBreak * 60;
         else state.pomodoro.remaining = settings.longBreak * 60;
         
+        if (autoStart) {
+            state.pomodoro.endTime = Date.now() + state.pomodoro.remaining * 1000;
+        }
+        
         saveState();
         updatePomodoroUI();
+        
+        if (autoStart) {
+            tickPomodoro();
+        }
     }
 
     function tickPomodoro() {
