@@ -21,10 +21,23 @@ fn save_state(app: tauri::AppHandle, state: String) {
     }
 }
 
+#[tauri::command]
+fn set_theme(app: tauri::AppHandle, theme: String) {
+    let tauri_theme = if theme == "dark" {
+        Some(tauri::Theme::Dark)
+    } else {
+        Some(tauri::Theme::Light)
+    };
+    
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.set_theme(tauri_theme);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![load_state, save_state])
+    .invoke_handler(tauri::generate_handler![load_state, save_state, set_theme])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

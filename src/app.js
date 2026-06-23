@@ -10,8 +10,10 @@
     function applyTheme() {
         if (state.theme === 'dark') {
             document.body.classList.add('dark-mode');
+            if (window.__TAURI__) window.__TAURI__.core.invoke('set_theme', { theme: 'dark' });
         } else {
             document.body.classList.remove('dark-mode');
+            if (window.__TAURI__) window.__TAURI__.core.invoke('set_theme', { theme: 'light' });
         }
     }
 
@@ -1312,18 +1314,6 @@
         
         // Theme toggle listener
         $('#theme-btn').addEventListener('click', toggleTheme);
-
-        // Window Controls
-        if (window.__TAURI__) {
-            const { Window } = window.__TAURI__.window;
-            const appWindow = Window.getCurrent();
-            
-            const minBtn = $('#win-min-btn');
-            const closeBtn = $('#win-close-btn');
-            
-            if (minBtn) minBtn.addEventListener('click', () => appWindow.minimize());
-            if (closeBtn) closeBtn.addEventListener('click', () => appWindow.close());
-        }
 
         initTabs();
         initModals();

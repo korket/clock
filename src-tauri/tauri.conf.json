@@ -13,10 +13,12 @@
         "title": "Clock",
         "width": 500,
         "height": 540,
+        "minWidth": 550,
+        "minHeight": 540,
         "resizable": true,
         "fullscreen": false,
-        "decorations": false,
-        "transparent": true
+        "decorations": true,
+        "transparent": false
       }
     ],
     "security": {
